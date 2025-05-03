@@ -5,147 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunkidi Notice Board</title>
     <style>
-        body {
-            /* padding-top: 70px; Adjust padding to account for fixed header */
-            font-family: 'Arial', sans-serif;
-            margin: 10px;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+       body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
         #header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0px;
+            height: auto; /* Adjust height to fit content */
             padding: 10px;
-            background-color: #ffffff;
-            box-shadow: none; /* Remove shadow effect */
-            border-radius: 0; /* Remove rounded edges */
-        }
-        #header h2 {
-            margin: 0;
-            font-size: 1em;
-            color: #00796b;
-        }
-        #authorNameContainer {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        #authorNameContainer label {
-            font-size: 1em;
-            color: #333;
-        }
-        #authorName {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1em;
-            max-width: 200px;
-        }
-        #authorName:focus {
-            border-color: #00796b;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
-        }
-        #noticeBoard {
-            border: none;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        #noticesContainer {
-            margin-top: 70px; /* Add margin to account for the fixed header */
-            height: 70vh; /* Adjust height to fit within the viewport */
-            overflow-y: auto;
-            padding: 10px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        .notice {
-            background-color: #e0f7fa;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 10px;
-            max-width: 75%;
-            word-wrap: break-word;
-            position: relative;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .notice::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: -12px;
-            width: 0;
-            height: 0;
-            border: 12px solid transparent;
-            border-right-color: #e0f7fa;
-            border-left: 0;
-            margin-top: -12px;
-        }
-        .notice .author {
-            font-size: 0.9em;
-            color: #00796b;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .notice .timestamp {
-            font-size: 0.8em;
-            color: #666;
-            text-align: right;
-            margin-top: 5px;
-        }
-        #postNoticeForm {
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            justify-content: center;
         }
-        #postNoticeForm .messageRow {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+
+        #header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #00796b;
         }
-        #postNoticeForm textarea {
-            flex: 1;
-            resize: none;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1em;
-        }
-        #postNoticeForm textarea:focus {
-            border-color: #00796b;
-            outline: none;
-            box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
-        }
-        #postNoticeForm button {
-            padding: 10px;
-            background-color: #00796b;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: background-color 0.3s ease;
-        }
-        #postNoticeForm button:hover {
-            background-color: #004d40;
-        }
-        #message {
+
+        #authorNameContainer {
             margin-top: 10px;
-            font-weight: bold;
+        }
+
+        #authorNameContainer label {
+            margin-right: 5px;
+        }
+
+        #authorName {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+/* Ensure the notice board takes up remaining space */
+#noticeBoard {
+    flex: 1; /* Take up remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent scrolling on the entire notice board */
+}
+
+        #noticesContainer {
+            flex: 1; /* Take up all available space in the notice board */
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow-y: auto; /* Enable vertical scrolling */
+        }
+
+/* Keep the message typing box visible */
+#postNoticeForm {
+    height: auto; /* Adjust height to fit content */
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: sticky; /* Keep it fixed at the bottom */
+    bottom: 0; /* Stick to the bottom of the viewport */
+}
+
+        .messageRow {
+            display: flex;
+            gap: 10px;
+        }
+
+        #noticeContent {
+            flex: 1;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: none;
+        }
+
+        #postNoticeForm button {
+            padding: 5px 10px;
+            background-color: #00796b;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #message {
+            /* margin-top: 10px; */
             font-size: 0.9em;
+            color: red;
+        }
+
+        .notice {
+            width: 70%;
+            margin-right: auto;
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .my_notice {
+            width: 70%;
+            margin-left: auto;
+            background-color: #e8f5e9;
+            border-right: 4px solid #4caf50;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #333;
+            text-align: right;
+        }
+
+        .notice .author, .my_notice .author {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .notice .timestamp, .my_notice .timestamp {
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -159,12 +155,10 @@
             <input type="text" id="authorName" placeholder="Your Name" required>
         </div>
     </div>
-    
 
     <div id="noticeBoard">
         <div id="noticesContainer"></div>
     </div>
-    
 
     <form id="postNoticeForm">
         <div class="messageRow">
@@ -172,7 +166,6 @@
             <button type="submit">➤</button>
         </div>
     </form>
-    <div id="message"></div>
 
     <script>
         const noticesContainer = document.getElementById('noticesContainer');
@@ -182,26 +175,6 @@
         const messageDiv = document.getElementById('message');
         const webAppUrl = 'https://script.google.com/macros/s/AKfycbxgvr3j9mpptcdwDv7TVGa8inNfotmOL3mo351rmUmAAEIQX9Y0khxWf_vIfwxAsiYo/exec';
 
-        // Generate a random suffix
-        function generateRandomSuffix() {
-            return Math.random().toString(36).substring(2, 6);
-        }
-
-        // Set default name with a random suffix if not already stored
-        if (!localStorage.getItem('authorName')) {
-            const defaultName = `User_${generateRandomSuffix()}`;
-            localStorage.setItem('authorName', defaultName);
-        }
-
-        // Populate the name input with the stored name
-        authorNameInput.value = localStorage.getItem('authorName');
-
-        authorNameInput.addEventListener('input', () => {
-            // Save the updated name to localStorage whenever it changes
-            localStorage.setItem('authorName', authorNameInput.value.trim());
-        });
-
-        // List of 20 dimmer fixed colors
         const fixedColors = [
             '#8B4513', '#556B2F', '#4682B4', '#6A5ACD', '#708090',
             '#2F4F4F', '#8B0000', '#B8860B', '#A0522D', '#5F9EA0',
@@ -209,10 +182,24 @@
             '#8B008B', '#9932CC', '#8FBC8F', '#778899', '#6B8E23'
         ];
 
-        // Map to store user-to-color mapping
         const userColorMap = new Map();
 
-        // Function to get a color for a user
+        function generateRandomSuffix() {
+            return Math.random().toString(36).substring(2, 6);
+        }
+
+        function initializeAuthorName() {
+            if (!localStorage.getItem('authorName')) {
+                const defaultName = `User_${generateRandomSuffix()}`;
+                localStorage.setItem('authorName', defaultName);
+            }
+            authorNameInput.value = localStorage.getItem('authorName');
+        }
+
+        function saveAuthorName() {
+            localStorage.setItem('authorName', authorNameInput.value.trim());
+        }
+
         function getColorForUser(username) {
             if (!userColorMap.has(username)) {
                 const colorIndex = userColorMap.size % fixedColors.length;
@@ -221,85 +208,90 @@
             return userColorMap.get(username);
         }
 
-        function fetchNotices() {
-            const isTyping = document.activeElement === noticeContentInput;
-
-            fetch(webAppUrl + '?action=getNotices', {
-                method: 'GET'
-            })
-            .then(response => response.json())
-            .then(data => {
-                const previousScrollHeight = noticesContainer.scrollHeight;
-                const isAtBottom = noticesContainer.scrollTop + noticesContainer.clientHeight >= previousScrollHeight - 10;
-
-                noticesContainer.innerHTML = ''; // Clear existing notices
-                data.reverse().forEach(notice => { // Reverse the order of notices
-                    const noticeDiv = document.createElement('div');
-                    noticeDiv.className = 'notice';
-                    const authorColor = getColorForUser(notice.author); // Get fixed color for the author
-                    noticeDiv.innerHTML = `
-                        <div class="author" style="color: ${authorColor};">~${notice.author}</div>
-                        <p>${notice.content}</p>
-                        <div class="timestamp">${notice.timestamp}</div>
-                    `;
-                    noticesContainer.appendChild(noticeDiv);
-                });
-
-                // Auto-scroll only if the user is typing or was already at the bottom
-                if (isTyping || isAtBottom) {
-                    noticesContainer.scrollTop = noticesContainer.scrollHeight;
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching notices:', error);
-                messageDiv.textContent = 'Failed to load notices. Please try again later.';
-                messageDiv.style.color = 'red';
-            });
+        function displayMessage(text, color = 'red') {
+            messageDiv.textContent = text;
+            messageDiv.style.color = color;
         }
+
+        function createNoticeElement(notice) {
+            const noticeDiv = document.createElement('div');
+            const isCurrentUser = notice.author === localStorage.getItem('authorName');
+            noticeDiv.className = isCurrentUser ? 'my_notice' : 'notice';
+
+            const authorColor = getColorForUser(notice.author);
+            noticeDiv.innerHTML = `
+                <div class="author" style="color: ${authorColor};">~${notice.author}</div>
+                <p>${notice.content}</p>
+                <div class="timestamp">${notice.timestamp}</div>
+            `;
+            return noticeDiv;
+        }
+
+        function scrollToBottom() {
+            noticesContainer.scrollTop = noticesContainer.scrollHeight;
+        }
+
+        function fetchNotices() {
+    return fetch(`${webAppUrl}?action=getNotices`, { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+            noticesContainer.innerHTML = ''; // Clear existing notices
+            data.reverse().forEach(notice => {
+                noticesContainer.appendChild(createNoticeElement(notice));
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching notices:', error);
+            displayMessage('Failed to load notices. Please try again later.');
+        });
+}
+function postNotice(author, content) {
+    const formData = new URLSearchParams();
+    formData.append('author', author);
+    formData.append('content', content);
+
+    fetch(`${webAppUrl}?action=postNotice`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            noticeContentInput.value = '';
+            fetchNotices().then(() => {
+                scrollToBottom(); // Scroll after notices are fetched and rendered
+            });
+        } else {
+            displayMessage(data.error || 'Failed to post notice.');
+        }
+    })
+    .catch(error => {
+        console.error('Error posting notice:', error);
+        displayMessage('Failed to post notice. Please try again later.');
+    });
+}
+
+
 
         postNoticeForm.addEventListener('submit', function(event) {
             event.preventDefault();
-
             const author = authorNameInput.value.trim();
             const content = noticeContentInput.value.trim();
 
             if (author && content) {
-                const formData = new URLSearchParams();
-                formData.append('author', author);
-                formData.append('content', content);
-
-                fetch(webAppUrl + '?action=postNotice', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // messageDiv.textContent = 'Notice posted successfully.';
-                        // messageDiv.style.color = 'green';
-                        // authorNameInput.value = '';
-                        noticeContentInput.value = '';
-                        fetchNotices(); // Refresh notices
-                    } else {
-                        messageDiv.textContent = data.error || 'Failed to post notice.';
-                        messageDiv.style.color = 'red';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error posting notice:', error);
-                    messageDiv.textContent = 'Failed to post notice. Please try again later.';
-                    messageDiv.style.color = 'red';
-                });
+                postNotice(author, content);
             } else {
-                messageDiv.textContent = 'Please enter your name and the notice content.';
-                messageDiv.style.color = 'orange';
+                displayMessage('Please enter your name and the notice content.', 'orange');
             }
         });
 
-        // Load initial notices when the page loads
+        authorNameInput.addEventListener('input', saveAuthorName);
+
+
+        initializeAuthorName();
+
         fetchNotices();
-        // Add periodic polling to fetch notices every 10 seconds
-        setInterval(fetchNotices, 10000); // Fetch notices every 10 seconds
+        setInterval(fetchNotices, 10000);
     </script>
 
 </body>
