@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Notice Board</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 10px;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #00796b;
+        }
+        #authorNameContainer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #authorNameContainer label {
+            font-size: 1em;
+            color: #333;
+        }
+        #authorName {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            max-width: 200px;
+        }
+        #authorName:focus {
+            border-color: #00796b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
+        }
+        #noticeBoard {
+            flex: 1;
+            border: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Make only the notices scrollable */
+        }
+        #noticesContainer {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .notice {
+            background-color: #e0f7fa;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            max-width: 75%;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .notice::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -12px;
+            width: 0;
+            height: 0;
+            border: 12px solid transparent;
+            border-right-color: #e0f7fa;
+            border-left: 0;
+            margin-top: -12px;
+        }
+        .notice .author {
+            font-size: 0.9em;
+            color: #00796b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .notice .timestamp {
+            font-size: 0.8em;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+        #postNoticeForm {
+            display: flex;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+            gap: 10px;
+        }
+        #postNoticeForm textarea {
+            flex: 1;
+            resize: none;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        #postNoticeForm textarea:focus {
+            border-color: #00796b;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 121, 107, 0.3);
+        }
+        #postNoticeForm button {
+            padding: 10px;
+            background-color: #00796b;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease;
+        }
+        #postNoticeForm button:hover {
+            background-color: #004d40;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h2>Public Notice Board</h2>
+        <div id="authorNameContainer">
+            <label for="authorName">Name:</label>
+            <input type="text" id="authorName" placeholder="Your Name" required>
+        </div>
+    </div>
+
+    <div id="noticeBoard">
+        <div id="noticesContainer"></div>
+    </div>
+
+    <form id="postNoticeForm">
+        <textarea id="noticeContent" rows="2" placeholder="Write your notice here..." required></textarea>
+        <button type="submit">➤</button>
+    </form>
+
+    <script>
+        const noticesContainer = document.getElementById('noticesContainer');
+        const postNoticeForm = document.getElementById('postNoticeForm');
+        const authorNameInput = document.getElementById('authorName');
+        const noticeContentInput = document.getElementById('noticeContent');
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxgvr3j9mpptcdwDv7TVGa8inNfotmOL3mo351rmUmAAEIQX9Y0khxWf_vIfwxAsiYo/exec';
+
+        // Generate a random suffix
+        function generateRandomSuffix() {
+            return Math.random().toString(36).substring(2, 6);
+        }
+
+        // Set default name with a random suffix if not already stored
+        if (!localStorage.getItem('authorName')) {
+            const defaultName = `User_${generateRandomSuffix()}`;
+            localStorage.setItem('authorName', defaultName);
+        }
+
+        // Populate the name input with the stored name
+        authorNameInput.value = localStorage.getItem('authorName');
+
+        authorNameInput.addEventListener('input', () => {
+            // Save the updated name to localStorage whenever it changes
+            localStorage.setItem('authorName', authorNameInput.value.trim());
+        });
+
+        function fetchNotices() {
+            fetch(webAppUrl + '?action=getNotices', {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                noticesContainer.innerHTML = ''; // Clear existing notices
+                data.reverse().forEach(notice => { // Reverse the order of notices
+                    const noticeDiv = document.createElement('div');
+                    noticeDiv.className = 'notice';
+                    noticeDiv.innerHTML = `
+                        <p>${notice.content}</p>
+                        <div class="author">Posted by: ${notice.author}</div>
+                        <div class="timestamp">${notice.timestamp}</div>
+                    `;
+                    noticesContainer.appendChild(noticeDiv);
+                });
+                // Auto-scroll to the bottom of the container
+                noticesContainer.scrollTop = noticesContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error fetching notices:', error);
+            });
+        }
+
+        postNoticeForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const author = authorNameInput.value.trim();
+            const content = noticeContentInput.value.trim();
+
+            if (author && content) {
+                const formData = new URLSearchParams();
+                formData.append('author', author);
+                formData.append('content', content);
+
+                fetch(webAppUrl + '?action=postNotice', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        authorNameInput.value = '';
+                        noticeContentInput.value = '';
+                        fetchNotices(); // Refresh notices
+                    }
+                })
+                .catch(error => {
+                    console.error('Error posting notice:', error);
+                });
+            }
+        });
+
+        // Load initial notices when the page loads
+        fetchNotices();
+        // Add periodic polling to fetch notices every 10 seconds
+        setInterval(fetchNotices, 10000); // Fetch notices every 10 seconds
+    </script>
+
+</body>
+</html>
