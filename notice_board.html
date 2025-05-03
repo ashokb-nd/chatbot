@@ -200,6 +200,26 @@
             localStorage.setItem('authorName', authorNameInput.value.trim());
         });
 
+        // List of 20 dimmer fixed colors
+        const fixedColors = [
+            '#8B4513', '#556B2F', '#4682B4', '#6A5ACD', '#708090',
+            '#2F4F4F', '#8B0000', '#B8860B', '#A0522D', '#5F9EA0',
+            '#7B68EE', '#483D8B', '#2E8B57', '#4B0082', '#696969',
+            '#8B008B', '#9932CC', '#8FBC8F', '#778899', '#6B8E23'
+        ];
+
+        // Map to store user-to-color mapping
+        const userColorMap = new Map();
+
+        // Function to get a color for a user
+        function getColorForUser(username) {
+            if (!userColorMap.has(username)) {
+                const colorIndex = userColorMap.size % fixedColors.length;
+                userColorMap.set(username, fixedColors[colorIndex]);
+            }
+            return userColorMap.get(username);
+        }
+
         function fetchNotices() {
             fetch(webAppUrl + '?action=getNotices', {
                 method: 'GET'
@@ -210,9 +230,10 @@
                 data.reverse().forEach(notice => { // Reverse the order of notices
                     const noticeDiv = document.createElement('div');
                     noticeDiv.className = 'notice';
+                    const authorColor = getColorForUser(notice.author); // Get fixed color for the author
                     noticeDiv.innerHTML = `
+                        <div class="author" style="color: ${authorColor};">~${notice.author}</div>
                         <p>${notice.content}</p>
-                        <div class="author">Posted by: ${notice.author}</div>
                         <div class="timestamp">${notice.timestamp}</div>
                     `;
                     noticesContainer.appendChild(noticeDiv);
