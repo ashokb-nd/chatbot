@@ -251,25 +251,25 @@
         }
 
         function fetchNotices() {
-            return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
-                .then(response => response.json())
-                .then(data => {
-                    lastRowNumber = data.lastRowNumber; // Update the last row number
-                    console.log('Last Row Number:', lastRowNumber);
-                    // Process the 2D array
-                    const noticesArray = data.data; // Extract the 2D array
-                    noticesArray.forEach(row => {
-                        const noticeElement = createNoticeElement(row);
-                        if (noticeElement) {
-                            noticesContainer.appendChild(noticeElement);
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching notices:', error);
-                    displayMessage('Failed to load notices. Please try again later.');
-                });
-        }
+    return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
+        .then(response => response.json())
+        .then(data => {
+            lastRowNumber = data.lastRowNumber;
+            const noticesArray = data.data;
+            const fragment = document.createDocumentFragment();
+            noticesArray.forEach(row => {
+                const noticeElement = createNoticeElement(row);
+                if (noticeElement) {
+                    fragment.appendChild(noticeElement);
+                }
+            });
+            noticesContainer.appendChild(fragment);
+        })
+        .catch(error => {
+            console.error('Error fetching notices:', error);
+            displayMessage('Failed to load notices. Please try again later.');
+        });
+}
 
 
 // post then fetch 
@@ -316,7 +316,11 @@ function postNotice(author, content) {
             }
         });
 
-        authorNameInput.addEventListener('input', saveAuthorName);
+        let saveAuthorNameTimeout;
+        authorNameInput.addEventListener('input', () => {
+            clearTimeout(saveAuthorNameTimeout);
+            saveAuthorNameTimeout = setTimeout(saveAuthorName, 300);
+        });
 
 
         initializeAuthorName();
@@ -330,7 +334,7 @@ function postNotice(author, content) {
             fetchNotices().then(() => {
                 scrollToBottom(); // Scroll to the bottom after fetching notices
             });
-        }, 20000); // Fetch every 20 seconds
+        }, 180000); // Fetch every 20 seconds
     </script>
 
 </body>
