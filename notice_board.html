@@ -177,6 +177,8 @@
         return crypto.randomUUID(); // Generate a unique ID
     }
 
+        let lastRowNumber = 0;
+        let uuids = new Set();
 
         const noticesContainer = document.getElementById('noticesContainer');
         const postNoticeForm = document.getElementById('postNoticeForm');
@@ -223,16 +225,23 @@
             messageDiv.style.color = color;
         }
 
-        function createNoticeElement(notice) {
+        // if duplicate id, then return none
+        function createNoticeElement(row) {
+            const [id, author, content, timestamp] = row; // Destructure the row
+            if (uuids.has(id)) {
+                return null; // Skip if the ID already exists
+            }
+            uuids.add(id); // Add the ID to the set
+
             const noticeDiv = document.createElement('div');
-            const isCurrentUser = notice.author === localStorage.getItem('authorName');
+            const isCurrentUser = author === localStorage.getItem('authorName');
             noticeDiv.className = isCurrentUser ? 'my_notice' : 'notice';
 
-            const authorColor = getColorForUser(notice.author);
+            const authorColor = getColorForUser(author);
             noticeDiv.innerHTML = `
-                <div class="author" style="color: ${authorColor};">~${notice.author}</div>
-                <p>${notice.content}</p>
-                <div class="timestamp">${notice.timestamp}</div>
+                <div class="author" style="color: ${authorColor};">~${author}</div>
+                <p>${content}</p>
+                <div class="timestamp">${timestamp}</div>
             `;
             return noticeDiv;
         }
@@ -242,24 +251,25 @@
         }
 
         function fetchNotices() {
-    return fetch(`${webAppUrl}?action=getNotices`, { method: 'GET' })
-        .then(response => response.json())
-        .then(data => {
-            noticesContainer.innerHTML = ''; // Clear existing notices
-
-            // Process the 2D array
-            const noticesArray = data.data; // Extract the 2D array
-            noticesArray.forEach(row => {
-                const [id, author, content, timestamp] = row; // Destructure the row
-                const notice = { id, author, content, timestamp }; // Convert to an object
-                noticesContainer.appendChild(createNoticeElement(notice));
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching notices:', error);
-            displayMessage('Failed to load notices. Please try again later.');
-        });
-}
+            return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    lastRowNumber = data.lastRowNumber; // Update the last row number
+                    console.log('Last Row Number:', lastRowNumber);
+                    // Process the 2D array
+                    const noticesArray = data.data; // Extract the 2D array
+                    noticesArray.forEach(row => {
+                        const noticeElement = createNoticeElement(row);
+                        if (noticeElement) {
+                            noticesContainer.appendChild(noticeElement);
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching notices:', error);
+                    displayMessage('Failed to load notices. Please try again later.');
+                });
+        }
 
 
 // post then fetch 
@@ -311,8 +321,16 @@ function postNotice(author, content) {
 
         initializeAuthorName();
 
-        fetchNotices();
-        setInterval(fetchNotices, 10000);
+        fetchNotices().then(() => {
+            scrollToBottom(); // Scroll to the bottom after fetching notices
+        });
+
+        // setInterval(fetchNotices, 10000);
+        setInterval(() => {
+            fetchNotices().then(() => {
+                scrollToBottom(); // Scroll to the bottom after fetching notices
+            });
+        }, 20000); // Fetch every 20 seconds
     </script>
 
 </body>
