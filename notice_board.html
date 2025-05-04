@@ -351,9 +351,10 @@ function postNotice(author, content) {
 }
 
 
-
+        // Handle form submission
         postNoticeForm.addEventListener('submit', function(event) {
-            event.preventDefault();
+            event.preventDefault(); // Prevent the default form submission
+            noticeContentInput.focus(); // Focus on the textarea
             const author = authorNameInput.value.trim();
             const content = noticeContentInput.value.trim();
 
@@ -364,6 +365,7 @@ function postNotice(author, content) {
             }
         });
 
+        // Save author name to local storage when the input changes
         let saveAuthorNameTimeout;
         authorNameInput.addEventListener('input', () => {
             clearTimeout(saveAuthorNameTimeout);
