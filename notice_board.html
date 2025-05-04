@@ -168,12 +168,15 @@
         <div id="noticesContainer"></div>
     </div>
 
+
     <form id="postNoticeForm">
+        <div id="message"></div>
         <div class="messageRow">
             <textarea id="noticeContent" rows="2" placeholder="Write your notice here..." required></textarea>
             <button type="submit">➤</button>
         </div>
     </form>
+
 
     <script>
         function generateTimestamp() {
@@ -229,8 +232,14 @@
         }
 
         function displayMessage(text, color = 'red') {
-            messageDiv.textContent = text;
-            messageDiv.style.color = color;
+            
+            // display for 3 seconds
+            messageDiv.innerHTML = `<span style="color: ${color}; text-align: center; display: block;">${text}</span>`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 30000);
+
         }
 
         // if duplicate id, then return none
@@ -320,7 +329,7 @@ function postNotice(author, content) {
             if (author && content) {
                 postNotice(author, content);
             } else {
-                displayMessage('Please enter your name and the notice content.', 'orange');
+                displayMessage('Please enter your name.', 'orange');
             }
         });
 
