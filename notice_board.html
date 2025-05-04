@@ -294,35 +294,61 @@
     }
 
 
-// post then fetch 
 function postNotice(author, content) {
-        const formData = new URLSearchParams();
-        formData.append('id', generateUUID()); // Generate ID on the frontend
-        formData.append('timestamp', generateTimestamp()); // Generate timestamp on the frontend
-        formData.append('author', author);
-        formData.append('content', content);
-
-        fetch(`${webAppUrl}?action=postNotice`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                noticeContentInput.value = '';
-                fetchNotices().then(() => {
-                    scrollToBottom(); // Scroll after notices are fetched and rendered
-                });
-            } else {
-                displayMessage(data.error || 'Failed to post notice.');
-            }
-        })
-        .catch(error => {
-            console.error('Error posting notice:', error);
-            displayMessage('Failed to post notice. Please try again later.');
-        });
+    if (content.length > 1000) {
+        displayMessage('Notice content exceeds 1000 characters. Please split it into multiple posts.', 'orange');
+        return;
     }
 
+    const id = generateUUID(); // Generate ID on the frontend
+    const timestamp = generateTimestamp(); // Generate timestamp on the frontend
+
+    // Optimistically add the notice to the UI
+    const noticeElement = createNoticeElement([id, author, content, timestamp]);
+    if (noticeElement) {
+        noticesContainer.appendChild(noticeElement);
+        scrollToBottom(); // Scroll to the bottom after adding the new notice
+    }
+
+    // Temporarily store the content in case of an error
+    const previousContent = content;
+
+    // Clear the input field immediately
+    noticeContentInput.value = '';
+
+    const formData = new URLSearchParams();
+    formData.append('id', id);
+    formData.append('timestamp', timestamp);
+    formData.append('author', author);
+    formData.append('content', content);
+
+    fetch(`${webAppUrl}?action=postNotice`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            // Remove the optimistically added notice if the server returns an error
+            uuids.delete(id); // Remove the ID from the set
+            noticesContainer.removeChild(noticeElement);
+            displayMessage(data.error || 'Failed to post notice.');
+
+            // Repopulate the input field with the previous content
+            noticeContentInput.value = previousContent;
+        }
+    })
+    .catch(error => {
+        console.error('Error posting notice:', error);
+        // Remove the optimistically added notice if there's a network error
+        uuids.delete(id); // Remove the ID from the set
+        noticesContainer.removeChild(noticeElement);
+        displayMessage('Failed to post notice. Please try again later.');
+
+        // Repopulate the input field with the previous content
+        noticeContentInput.value = previousContent;
+    });
+}
 
 
 
