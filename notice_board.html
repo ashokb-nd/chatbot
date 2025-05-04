@@ -151,10 +151,23 @@
             color: #999;
             margin-top: 5px;
         }
+
+        /* Add styles for the tick mark */
+        .tick {
+            font-size: 0.8em;
+            color: #4caf50; /* Green color for the tick */
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
-
+    <audio id="post_audio" src="https://ashokbatakala.github.io/assets/img/outside_files/message_sent.mp3"></audio>
+    <script>
+        const audio = document.getElementById('post_audio');
+        audio.onerror = () => {
+            console.error('Audio failed to load. Check the file format or URL.');
+        };
+    </script>
     <div id="header">
         <h2>Sunkidi Notice Board</h2>
 
@@ -258,7 +271,10 @@
             noticeDiv.innerHTML = `
                 <div class="author" style="color: ${authorColor};">~${author}</div>
                 <p>${content}</p>
-                <div class="timestamp">${timestamp}</div>
+                <div class="timestamp">
+                    ${timestamp}
+                    ${isCurrentUser ? '<span class="tick" style="display: none;">✔</span>' : ''}
+                </div>
             `;
             return noticeDiv;
         }
@@ -336,6 +352,16 @@ function postNotice(author, content) {
 
             // Repopulate the input field with the previous content
             noticeContentInput.value = previousContent;
+        } else {
+            // Play the audio on successful post
+            audio.currentTime = 0; // Reset audio to start
+            audio.play();
+
+            // Show the tick mark to indicate success
+            const tickElement = noticeElement.querySelector('.tick');
+            if (tickElement) {
+                tickElement.style.display = 'inline'; // Make the tick visible
+            }
         }
     })
     .catch(error => {
@@ -401,3 +427,4 @@ noticeContentInput.addEventListener('input', autoResizeTextarea);
 
 </body>
 </html>
+``` 
