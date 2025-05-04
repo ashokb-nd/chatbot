@@ -39,19 +39,14 @@ function getNotices(lastRowNumber = 0) {
   const startRow = lastRowNumber > 0 ? lastRowNumber + 1 : Math.max(2, lastRow - 99); // Start from the next row or last 100 rows
   const range = sheet.getRange(startRow, 1, lastRow - startRow + 1, sheet.getLastColumn());
   const data = range.getValues();
-
-  const notices = data.map(row => ({
-    id: row[ID_COLUMN],
-    author: row[AUTHOR_COLUMN],
-    content: row[CONTENT_COLUMN],
-    // timestamp: Utilities.formatDate(new Date(row[TIMESTAMP_COLUMN]), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss")
-    timestamp: row[TIMESTAMP_COLUMN] // Keep the original timestamp format
-  }));
-
-  return ContentService.createTextOutput(JSON.stringify({ notices, lastRowNumber: lastRow }))
+  
+  // Return the 2D array directly
+  return ContentService.createTextOutput(JSON.stringify({ data, lastRowNumber: lastRow }))
       .setMimeType(ContentService.MimeType.JSON);
 }
 
+
+// simply append row
 function doPost(e) {
   const author = e.parameter.author;
   const content = e.parameter.content;

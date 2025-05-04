@@ -183,7 +183,7 @@
         const authorNameInput = document.getElementById('authorName');
         const noticeContentInput = document.getElementById('noticeContent');
         const messageDiv = document.getElementById('message');
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycbxgvr3j9mpptcdwDv7TVGa8inNfotmOL3mo351rmUmAAEIQX9Y0khxWf_vIfwxAsiYo/exec';
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbx0BTH66hmLvmJfSWCkm2go4FQDcwhZ2_3_6ITiPl_ctXp9xyQxHNzay_ageWmnAqu7/exec';
 
         const fixedColors = [
             '#8B4513', '#556B2F', '#4682B4', '#6A5ACD', '#708090',
@@ -246,7 +246,12 @@
         .then(response => response.json())
         .then(data => {
             noticesContainer.innerHTML = ''; // Clear existing notices
-            data.reverse().forEach(notice => {
+
+            // Process the 2D array
+            const noticesArray = data.data; // Extract the 2D array
+            noticesArray.forEach(row => {
+                const [id, author, content, timestamp] = row; // Destructure the row
+                const notice = { id, author, content, timestamp }; // Convert to an object
                 noticesContainer.appendChild(createNoticeElement(notice));
             });
         })
