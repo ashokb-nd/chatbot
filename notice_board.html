@@ -168,6 +168,16 @@
     </form>
 
     <script>
+        function generateTimestamp() {
+        const now = new Date();
+        return now.toISOString().replace('T', ' ').substring(0, 19); // Format as "yyyy-MM-dd HH:mm:ss"
+    }
+
+    function generateUUID() {
+        return crypto.randomUUID(); // Generate a unique ID
+    }
+
+
         const noticesContainer = document.getElementById('noticesContainer');
         const postNoticeForm = document.getElementById('postNoticeForm');
         const authorNameInput = document.getElementById('authorName');
@@ -245,31 +255,37 @@
             displayMessage('Failed to load notices. Please try again later.');
         });
 }
-function postNotice(author, content) {
-    const formData = new URLSearchParams();
-    formData.append('author', author);
-    formData.append('content', content);
 
-    fetch(`${webAppUrl}?action=postNotice`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            noticeContentInput.value = '';
-            fetchNotices().then(() => {
-                scrollToBottom(); // Scroll after notices are fetched and rendered
-            });
-        } else {
-            displayMessage(data.error || 'Failed to post notice.');
-        }
-    })
-    .catch(error => {
-        console.error('Error posting notice:', error);
-        displayMessage('Failed to post notice. Please try again later.');
-    });
-}
+
+// post then fetch 
+function postNotice(author, content) {
+        const formData = new URLSearchParams();
+        formData.append('id', generateUUID()); // Generate ID on the frontend
+        formData.append('timestamp', generateTimestamp()); // Generate timestamp on the frontend
+        formData.append('author', author);
+        formData.append('content', content);
+
+        fetch(`${webAppUrl}?action=postNotice`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                noticeContentInput.value = '';
+                fetchNotices().then(() => {
+                    scrollToBottom(); // Scroll after notices are fetched and rendered
+                });
+            } else {
+                displayMessage(data.error || 'Failed to post notice.');
+            }
+        })
+        .catch(error => {
+            console.error('Error posting notice:', error);
+            displayMessage('Failed to post notice. Please try again later.');
+        });
+    }
+
 
 
 

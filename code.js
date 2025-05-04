@@ -12,7 +12,8 @@ function doGet(e) {
   const action = e.parameter.action;
 
   if (action === 'getNotices') {
-    return getNotices();
+    const lastRowNumber = parseInt(e.parameter.lastRowNumber || 0);
+    return getNotices(lastRowNumber);
   }
 
   return HtmlService.createHtmlOutputFromFile('index')
@@ -20,35 +21,42 @@ function doGet(e) {
       .setTitle("Public Notice Board");
 }
 
-function getNotices() {
+function getNotices(lastRowNumber = 0) {
   const ss = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
   const sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify([]))
+    return ContentService.createTextOutput(JSON.stringify({ notices: [], lastRowNumber: 0 }))
         .setMimeType(ContentService.MimeType.JSON);
   }
 
-  const data = sheet.getDataRange().getValues();
-  const notices = [];
-  for (let i = 1; i < data.length; i++) {
-    notices.push({
-      id: data[i][ID_COLUMN],
-      author: data[i][AUTHOR_COLUMN],
-      content: data[i][CONTENT_COLUMN],
-      timestamp: Utilities.formatDate(new Date(data[i][TIMESTAMP_COLUMN]), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss")
-    });
+  const lastRow = sheet.getLastRow();
+  if (lastRowNumber >= lastRow) {
+    // No new rows to fetch
+    return ContentService.createTextOutput(JSON.stringify({ notices: [], lastRowNumber }))
+        .setMimeType(ContentService.MimeType.JSON);
   }
-  notices.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-  return ContentService.createTextOutput(JSON.stringify(notices))
+
+  const startRow = lastRowNumber > 0 ? lastRowNumber + 1 : Math.max(2, lastRow - 99); // Start from the next row or last 100 rows
+  const range = sheet.getRange(startRow, 1, lastRow - startRow + 1, sheet.getLastColumn());
+  const data = range.getValues();
+
+  const notices = data.map(row => ({
+    id: row[ID_COLUMN],
+    author: row[AUTHOR_COLUMN],
+    content: row[CONTENT_COLUMN],
+    // timestamp: Utilities.formatDate(new Date(row[TIMESTAMP_COLUMN]), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss")
+    timestamp: row[TIMESTAMP_COLUMN] // Keep the original timestamp format
+  }));
+
+  return ContentService.createTextOutput(JSON.stringify({ notices, lastRowNumber: lastRow }))
       .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   const author = e.parameter.author;
   const content = e.parameter.content;
-
-  // const author = 'me';
-  // const content = 'fslfjsl';
+  const id = e.parameter.id 
+  const timestamp = e.parameter.timestamp 
 
   if (!author || !content) {
     return ContentService.createTextOutput(JSON.stringify({ success: false, error: "Author and content are required." }))
@@ -63,11 +71,9 @@ function doPost(e) {
     sheet.appendRow(['ID', 'Author', 'Content', 'Timestamp']); // Add headers
   }
 
-  const timestamp = new Date();
-  const id = Utilities.getUuid(); // Generate a unique ID
-
   sheet.appendRow([id, author, content, timestamp]);
 
+  // Return success response without fetching notices
   return ContentService.createTextOutput(JSON.stringify({ success: true }))
       .setMimeType(ContentService.MimeType.JSON);
 }
