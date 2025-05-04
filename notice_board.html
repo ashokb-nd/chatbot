@@ -47,22 +47,22 @@
             width: 200px;
         }
 
-/* Ensure the notice board takes up remaining space */
-#noticeBoard {
-    flex: 1; /* Take up remaining space */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevent scrolling on the entire notice board */
-}
+    /* Ensure the notice board takes up remaining space */
+    #noticeBoard {
+        flex: 1; /* Take up remaining space */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Prevent scrolling on the entire notice board */
+    }
 
-        #noticesContainer {
-            flex: 1; /* Take up all available space in the notice board */
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            overflow-y: auto; /* Enable vertical scrolling */
-        }
+    #noticesContainer {
+        flex: 1; /* Take up all available space in the notice board */
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
 
 /* Keep the message typing box visible */
 #postNoticeForm {
@@ -133,6 +133,11 @@
             color: #333;
             /* text-align: left; */
         }
+        .notice, .my_notice {
+        word-wrap: break-word; /* Break long words */
+        overflow-wrap: break-word; /* Ensure text wraps within the box */
+        /* white-space: pre-wrap; Preserve new lines and wrap text */
+}
 
         .notice p, .my_notice p {
         white-space: pre-wrap; /* Preserve new lines and whitespace */
@@ -287,12 +292,11 @@
         return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
         .then(response => response.json())
         .then(data => {
-            // console.log(data);
             lastRowNumber = data.lastRowNumber;
             const noticesArray = data.data;
             if (noticesArray.length === 0) {
                 displayMessage('No new notices available.', 'orange');
-                return;
+                return false; // Return false if no new notices
             }
             const fragment = document.createDocumentFragment();
             noticesArray.forEach(row => {
@@ -302,10 +306,12 @@
                 }
             });
             noticesContainer.appendChild(fragment);
+            return true; // Return true if notices are fetched
         })
         .catch(error => {
             console.error('Error fetching notices:', error);
             displayMessage('Failed to load notices. Please try again later.');
+            return false; // Return false in case of an error
         });
     }
 
@@ -405,12 +411,23 @@ function postNotice(author, content) {
             scrollToBottom(); // Scroll to the bottom after fetching notices
         });
 
-        // setInterval(fetchNotices, 10000);
+        // setInterval(fetchNotices, 180000);
+        // scrolltobottom if the user is close to the bottom , after fetching
+        const scrollThreshold = 100; // Distance from the bottom to trigger scrolling
+        function scrolldown_if_close() {
+            if (noticesContainer.scrollHeight - noticesContainer.scrollTop <= noticesContainer.clientHeight + scrollThreshold) {
+                scrollToBottom();
+            }
+        }
+        
         setInterval(() => {
-            fetchNotices().then(() => {
-                scrollToBottom(); // Scroll to the bottom after fetching notices
+            fetchNotices().then((fetched) => {
+                // console.log('Fetched:', fetched);
+                if (fetched) {
+                    scrolldown_if_close(); // Check scroll position only if new notices are fetched
+                }
             });
-        }, 180000); // Fetch every 20 seconds
+        }, 180000); // Fetch every 3 minutes
 
 
 // const noticeContentInput = document.getElementById('noticeContent');
@@ -427,4 +444,3 @@ noticeContentInput.addEventListener('input', autoResizeTextarea);
 
 </body>
 </html>
-``` 
