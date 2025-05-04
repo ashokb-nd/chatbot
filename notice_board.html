@@ -5,19 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunkidi Notice Board</title>
     <style>
-       body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    color: #333;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
 
         #header {
-            height: auto; /* Adjust height to fit content */
+            height: auto;
             padding: 10px;
             background-color: #fff;
             border-bottom: 1px solid #ccc;
@@ -47,36 +47,34 @@
             width: 200px;
         }
 
-    /* Ensure the notice board takes up remaining space */
-    #noticeBoard {
-        flex: 1; /* Take up remaining space */
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; /* Prevent scrolling on the entire notice board */
-    }
+        #noticeBoard {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-    #noticesContainer {
-        flex: 1; /* Take up all available space in the notice board */
-        padding: 10px;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        overflow-y: auto; /* Enable vertical scrolling */
-    }
+        #noticesContainer {
+            flex: 1;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow-y: auto;
+        }
 
-/* Keep the message typing box visible */
-#postNoticeForm {
-    height: auto; /* Adjust height to fit content */
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    position: sticky; /* Keep it fixed at the bottom */
-    bottom: 0; /* Stick to the bottom of the viewport */
-}
+        #postNoticeForm {
+            height: auto;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: sticky;
+            bottom: 0;
+        }
 
         .messageRow {
             display: flex;
@@ -89,8 +87,8 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: none;
-            max-height: 200px; /* Set a maximum height */
-            overflow-y: auto; /* Add a scrollbar if the content exceeds max height */
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         #postNoticeForm button {
@@ -103,7 +101,6 @@
         }
 
         #message {
-            /* margin-top: 10px; */
             font-size: 0.9em;
             color: red;
         }
@@ -118,7 +115,6 @@
             border-radius: 4px;
             font-size: 0.9em;
             color: #333;
-            /* text-align: left; */
         }
 
         .my_notice {
@@ -131,17 +127,16 @@
             border-radius: 4px;
             font-size: 0.9em;
             color: #333;
-            /* text-align: left; */
         }
+
         .notice, .my_notice {
-        word-wrap: break-word; /* Break long words */
-        overflow-wrap: break-word; /* Ensure text wraps within the box */
-        /* white-space: pre-wrap; Preserve new lines and wrap text */
-}
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
 
         .notice p, .my_notice p {
-        white-space: pre-wrap; /* Preserve new lines and whitespace */
-        margin: 0; /* Remove default margin for paragraphs */
+            white-space: pre-wrap;
+            margin: 0;
         }
 
         .notice .author, .my_notice .author {
@@ -157,10 +152,9 @@
             margin-top: 5px;
         }
 
-        /* Add styles for the tick mark */
         .tick {
             font-size: 0.8em;
-            color: #4caf50; /* Green color for the tick */
+            color: #4caf50;
             margin-left: 5px;
         }
     </style>
@@ -175,18 +169,14 @@
     </script>
     <div id="header">
         <h2>Sunkidi Notice Board</h2>
-
         <div id="authorNameContainer">
             <label for="authorName">Name:</label>
             <input type="text" id="authorName" placeholder="Your Name" required>
         </div>
     </div>
-
     <div id="noticeBoard">
         <div id="noticesContainer"></div>
     </div>
-
-
     <form id="postNoticeForm">
         <div id="message"></div>
         <div class="messageRow">
@@ -194,17 +184,15 @@
             <button type="submit">➤</button>
         </div>
     </form>
-
-
     <script>
         function generateTimestamp() {
-        const now = new Date();
-        return now.toISOString().replace('T', ' ').substring(0, 19); // Format as "yyyy-MM-dd HH:mm:ss"
-    }
+            const now = new Date();
+            return now.toISOString().replace('T', ' ').substring(0, 19);
+        }
 
-    function generateUUID() {
-        return crypto.randomUUID(); // Generate a unique ID
-    }
+        function generateUUID() {
+            return crypto.randomUUID();
+        }
 
         let lastRowNumber = 0;
         let uuids = new Set();
@@ -250,23 +238,19 @@
         }
 
         function displayMessage(text, color = 'red') {
-            
-            // display for 3 seconds
             messageDiv.innerHTML = `<span style="color: ${color}; text-align: center; display: block;">${text}</span>`;
             messageDiv.style.display = 'block';
             setTimeout(() => {
                 messageDiv.style.display = 'none';
             }, 30000);
-
         }
 
-        // if duplicate id, then return none
         function createNoticeElement(row) {
-            const [id, author, content, timestamp] = row; // Destructure the row
+            const [id, author, content, timestamp] = row;
             if (uuids.has(id)) {
-                return null; // Skip if the ID already exists
+                return null;
             }
-            uuids.add(id); // Add the ID to the set
+            uuids.add(id);
 
             const noticeDiv = document.createElement('div');
             const isCurrentUser = author === localStorage.getItem('authorName');
@@ -288,105 +272,90 @@
             noticesContainer.scrollTop = noticesContainer.scrollHeight;
         }
 
-    function fetchNotices() {
-        return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            lastRowNumber = data.lastRowNumber;
-            const noticesArray = data.data;
-            if (noticesArray.length === 0) {
-                displayMessage('No new notices available.', 'orange');
-                return false; // Return false if no new notices
-            }
-            const fragment = document.createDocumentFragment();
-            noticesArray.forEach(row => {
-                const noticeElement = createNoticeElement(row);
-                if (noticeElement) {
-                    fragment.appendChild(noticeElement);
-                }
-            });
-            noticesContainer.appendChild(fragment);
-            return true; // Return true if notices are fetched
-        })
-        .catch(error => {
-            console.error('Error fetching notices:', error);
-            displayMessage('Failed to load notices. Please try again later.');
-            return false; // Return false in case of an error
-        });
-    }
-
-
-function postNotice(author, content) {
-    if (content.length > 1000) {
-        displayMessage('Notice content exceeds 1000 characters. Please split it into multiple posts.', 'orange');
-        return;
-    }
-
-    const id = generateUUID(); // Generate ID on the frontend
-    const timestamp = generateTimestamp(); // Generate timestamp on the frontend
-
-    // Optimistically add the notice to the UI
-    const noticeElement = createNoticeElement([id, author, content, timestamp]);
-    if (noticeElement) {
-        noticesContainer.appendChild(noticeElement);
-        scrollToBottom(); // Scroll to the bottom after adding the new notice
-    }
-
-    // Temporarily store the content in case of an error
-    const previousContent = content;
-
-    // Clear the input field immediately
-    noticeContentInput.value = '';
-
-    const formData = new URLSearchParams();
-    formData.append('id', id);
-    formData.append('timestamp', timestamp);
-    formData.append('author', author);
-    formData.append('content', content);
-
-    fetch(`${webAppUrl}?action=postNotice`, {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (!data.success) {
-            // Remove the optimistically added notice if the server returns an error
-            uuids.delete(id); // Remove the ID from the set
-            noticesContainer.removeChild(noticeElement);
-            displayMessage(data.error || 'Failed to post notice.');
-
-            // Repopulate the input field with the previous content
-            noticeContentInput.value = previousContent;
-        } else {
-            // Play the audio on successful post
-            audio.currentTime = 0; // Reset audio to start
-            audio.play();
-
-            // Show the tick mark to indicate success
-            const tickElement = noticeElement.querySelector('.tick');
-            if (tickElement) {
-                tickElement.style.display = 'inline'; // Make the tick visible
-            }
+        function fetchNotices() {
+            return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
+                .then(response => response.json())
+                .then(data => {
+                    lastRowNumber = data.lastRowNumber;
+                    const noticesArray = data.data;
+                    if (noticesArray.length === 0) {
+                        displayMessage('No new notices available.', 'orange');
+                        return false;
+                    }
+                    const fragment = document.createDocumentFragment();
+                    noticesArray.forEach(row => {
+                        const noticeElement = createNoticeElement(row);
+                        if (noticeElement) {
+                            fragment.appendChild(noticeElement);
+                        }
+                    });
+                    noticesContainer.appendChild(fragment);
+                    return true;
+                })
+                .catch(error => {
+                    console.error('Error fetching notices:', error);
+                    displayMessage('Failed to load notices. Please try again later.');
+                    return false;
+                });
         }
-    })
-    .catch(error => {
-        console.error('Error posting notice:', error);
-        // Remove the optimistically added notice if there's a network error
-        uuids.delete(id); // Remove the ID from the set
-        noticesContainer.removeChild(noticeElement);
-        displayMessage('Failed to post notice. Please try again later.');
 
-        // Repopulate the input field with the previous content
-        noticeContentInput.value = previousContent;
-    });
-}
+        function postNotice(author, content) {
+            if (content.length > 1000) {
+                displayMessage('Notice content exceeds 1000 characters. Please split it into multiple posts.', 'orange');
+                return;
+            }
 
+            const id = generateUUID();
+            const timestamp = generateTimestamp();
 
-        // Handle form submission
+            const noticeElement = createNoticeElement([id, author, content, timestamp]);
+            if (noticeElement) {
+                noticesContainer.appendChild(noticeElement);
+                scrollToBottom();
+            }
+
+            const previousContent = content;
+            noticeContentInput.value = '';
+
+            const formData = new URLSearchParams();
+            formData.append('id', id);
+            formData.append('timestamp', timestamp);
+            formData.append('author', author);
+            formData.append('content', content);
+
+            fetch(`${webAppUrl}?action=postNotice`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        uuids.delete(id);
+                        noticesContainer.removeChild(noticeElement);
+                        displayMessage(data.error || 'Failed to post notice.');
+                        noticeContentInput.value = previousContent;
+                    } else {
+                        audio.currentTime = 0;
+                        audio.play();
+
+                        const tickElement = noticeElement.querySelector('.tick');
+                        if (tickElement) {
+                            tickElement.style.display = 'inline';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error posting notice:', error);
+                    uuids.delete(id);
+                    noticesContainer.removeChild(noticeElement);
+                    displayMessage('Failed to post notice. Please try again later.');
+                    noticeContentInput.value = previousContent;
+                });
+        }
+
         postNoticeForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-            noticeContentInput.focus(); // Focus on the textarea
+            event.preventDefault();
+            noticeContentInput.focus();
             const author = authorNameInput.value.trim();
             const content = noticeContentInput.value.trim();
 
@@ -397,50 +366,39 @@ function postNotice(author, content) {
             }
         });
 
-        // Save author name to local storage when the input changes
         let saveAuthorNameTimeout;
         authorNameInput.addEventListener('input', () => {
             clearTimeout(saveAuthorNameTimeout);
             saveAuthorNameTimeout = setTimeout(saveAuthorName, 300);
         });
 
-
         initializeAuthorName();
 
         fetchNotices().then(() => {
-            scrollToBottom(); // Scroll to the bottom after fetching notices
+            scrollToBottom();
         });
 
-        // setInterval(fetchNotices, 180000);
-        // scrolltobottom if the user is close to the bottom , after fetching
-        const scrollThreshold = 100; // Distance from the bottom to trigger scrolling
+        const scrollThreshold = 100;
         function scrolldown_if_close() {
             if (noticesContainer.scrollHeight - noticesContainer.scrollTop <= noticesContainer.clientHeight + scrollThreshold) {
                 scrollToBottom();
             }
         }
-        
+
         setInterval(() => {
             fetchNotices().then((fetched) => {
-                // console.log('Fetched:', fetched);
                 if (fetched) {
-                    scrolldown_if_close(); // Check scroll position only if new notices are fetched
+                    scrolldown_if_close();
                 }
             });
-        }, 180000); // Fetch every 3 minutes
+        }, 180000);
 
+        function autoResizeTextarea() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+        }
 
-// const noticeContentInput = document.getElementById('noticeContent');
-
-// Function to auto-resize the textarea
-function autoResizeTextarea() {
-    this.style.height = 'auto'; // Reset height to calculate the new height
-    this.style.height = Math.min(this.scrollHeight, 200) + 'px'; // Set height to scrollHeight, with a max height of 200px
-}
-
-// Attach the auto-resize function to the input event
-noticeContentInput.addEventListener('input', autoResizeTextarea);
+        noticeContentInput.addEventListener('input', autoResizeTextarea);
     </script>
-
 </body>
 </html>
