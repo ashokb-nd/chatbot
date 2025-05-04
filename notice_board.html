@@ -267,12 +267,17 @@
             noticesContainer.scrollTop = noticesContainer.scrollHeight;
         }
 
-        function fetchNotices() {
-    return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
+    function fetchNotices() {
+        return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
         .then(response => response.json())
         .then(data => {
+            // console.log(data);
             lastRowNumber = data.lastRowNumber;
             const noticesArray = data.data;
+            if (noticesArray.length === 0) {
+                displayMessage('No new notices available.', 'orange');
+                return;
+            }
             const fragment = document.createDocumentFragment();
             noticesArray.forEach(row => {
                 const noticeElement = createNoticeElement(row);
@@ -286,7 +291,7 @@
             console.error('Error fetching notices:', error);
             displayMessage('Failed to load notices. Please try again later.');
         });
-}
+    }
 
 
 // post then fetch 

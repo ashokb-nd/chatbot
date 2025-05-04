@@ -25,14 +25,14 @@ function getNotices(lastRowNumber = 0) {
   const ss = SpreadsheetApp.openById(GOOGLE_SHEET_ID);
   const sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
-    return ContentService.createTextOutput(JSON.stringify({ notices: [], lastRowNumber: 0 }))
+    return ContentService.createTextOutput(JSON.stringify({ data: [], lastRowNumber: 0 }))
         .setMimeType(ContentService.MimeType.JSON);
   }
 
   const lastRow = sheet.getLastRow();
   if (lastRowNumber >= lastRow) {
     // No new rows to fetch
-    return ContentService.createTextOutput(JSON.stringify({ notices: [], lastRowNumber }))
+    return ContentService.createTextOutput(JSON.stringify({ data: [], lastRowNumber }))
         .setMimeType(ContentService.MimeType.JSON);
   }
 
