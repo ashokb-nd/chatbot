@@ -89,6 +89,8 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: none;
+            max-height: 200px; /* Set a maximum height */
+            overflow-y: auto; /* Add a scrollbar if the content exceeds max height */
         }
 
         #postNoticeForm button {
@@ -341,6 +343,18 @@ function postNotice(author, content) {
                 scrollToBottom(); // Scroll to the bottom after fetching notices
             });
         }, 180000); // Fetch every 20 seconds
+
+
+// const noticeContentInput = document.getElementById('noticeContent');
+
+// Function to auto-resize the textarea
+function autoResizeTextarea() {
+    this.style.height = 'auto'; // Reset height to calculate the new height
+    this.style.height = Math.min(this.scrollHeight, 200) + 'px'; // Set height to scrollHeight, with a max height of 200px
+}
+
+// Attach the auto-resize function to the input event
+noticeContentInput.addEventListener('input', autoResizeTextarea);
     </script>
 
 </body>
