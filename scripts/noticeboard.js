@@ -13,7 +13,36 @@ const noticeContentInput = document.getElementById('noticeContent');
 const messageDiv = document.getElementById('message');
 let lastRowNumber = 0;
 
-displayMessage("version 9.0.4", "green");
+displayMessage("version 9.0.5", "green");
+/**
+ * Posts a notice with the user's current geolocation.
+ */
+function postGeolocationNotice() {
+    if (!navigator.geolocation) {
+        console.warn('Geolocation is not supported by this browser.');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const { latitude, longitude } = position.coords;
+            const author = 'System';
+            const content = `latlong ${latitude},${longitude}`;
+            postNotice(author, content);
+        },
+        (error) => {
+            console.error('Error fetching geolocation:', error);
+            if (error.code === error.PERMISSION_DENIED) {
+                displayMessage('Geolocation access denied. Please enable location permissions in your browser settings.', 'orange');
+            } else if (error.message.includes('Only secure origins are allowed')) {
+                displayMessage('Geolocation requires a secure origin (HTTPS). Please use HTTPS or localhost.', 'orange');
+            } else {
+                displayMessage('Unable to fetch geolocation. Please allow location access.', 'orange');
+            }
+        }
+    );
+}
+
 /**
  * Initializes the noticeboard application.
  * Sets up event listeners, loads stored notices, and starts periodic fetching of new notices.
@@ -35,6 +64,9 @@ function initialize() {
 
     setupEventListeners();
     fetchNotices().then(scrollToBottom);
+
+    // Post geolocation notice on first load
+    postGeolocationNotice();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/chatbot/service-worker.js')
