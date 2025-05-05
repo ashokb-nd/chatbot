@@ -124,6 +124,7 @@ function fetchNotices() {
 
 // Post Notice
 function postNotice(author, content) {
+    console.log('Posting notice:', { author, content });
     if (content.length > 1000) {
         displayMessage('Notice content exceeds 1000 characters. Please split it into multiple posts.', 'orange');
         return;
@@ -188,6 +189,7 @@ postNoticeForm.addEventListener('submit', function(event) {
     }
 });
 
+let saveAuthorNameTimeout;
 authorNameInput.addEventListener('input', () => {
     clearTimeout(saveAuthorNameTimeout);
     saveAuthorNameTimeout = setTimeout(saveAuthorName, 300);
