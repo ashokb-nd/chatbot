@@ -20,7 +20,7 @@ export class NoticeManager {
         return fetchWithErrorHandling(url)
             .then(data => {
                 if (data.data.length === 0) {
-                    displayMessage('No new notices available.', 'orange');
+                    // displayMessage('No new notices available.', 'orange');
                     return { success: false, notices: [] };
                 }
                 return { success: true, notices: data.data, lastRowNumber: data.lastRowNumber };
