@@ -50,6 +50,28 @@ function saveAuthorName() {
     localStorage.setItem('authorName', authorNameInput.value.trim());
 }
 
+function saveNoticesToLocalStorage(noticesArray) {
+    const storedNotices = JSON.parse(localStorage.getItem('notices')) || [];
+    const updatedNotices = [...storedNotices, ...noticesArray];
+    localStorage.setItem('notices', JSON.stringify(updatedNotices));
+}
+
+function loadNoticesFromLocalStorage() {
+    const storedNotices = JSON.parse(localStorage.getItem('notices')) || [];
+    appendNotices(storedNotices);
+}
+
+function saveLastRowNumberToLocalStorage() {
+    localStorage.setItem('lastRowNumber', lastRowNumber);
+}
+
+function loadLastRowNumberFromLocalStorage() {
+    const storedLastRowNumber = localStorage.getItem('lastRowNumber');
+    if (storedLastRowNumber) {
+        lastRowNumber = parseInt(storedLastRowNumber, 0);
+    }
+}
+
 // UI Helpers
 function displayMessage(text, color = 'red') {
     messageDiv.innerHTML = `<span style="color: ${color}; text-align: center; display: block;">${text}</span>`;
@@ -112,7 +134,10 @@ function fetchNotices() {
                 displayMessage('No new notices available.', 'orange');
                 return false;
             }
+            saveLastRowNumberToLocalStorage();
+            saveNoticesToLocalStorage(noticesArray);
             appendNotices(noticesArray);
+            console.log('Fetched notices:', noticesArray);
             return true;
         })
         .catch(error => {
@@ -199,6 +224,8 @@ noticeContentInput.addEventListener('input', autoResizeTextarea);
 
 // Initialization
 initializeAuthorName();
+loadNoticesFromLocalStorage();
+loadLastRowNumberFromLocalStorage();
 fetchNotices().then(scrollToBottom);
 
 // Periodic Updates
