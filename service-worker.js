@@ -1,14 +1,14 @@
 const CACHE_NAME = 'noticeboard-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/scripts/noticeboard.js',
-  '/styles/main.css',
-  '/styles/header.css',
-  '/styles/form.css',
-  '/styles/notices.css',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/chatbot/',
+  '/chatbot/index.html',
+  '/chatbot/scripts/noticeboard.js',
+  '/chatbot/styles/main.css',
+  '/chatbot/styles/header.css',
+  '/chatbot/styles/form.css',
+  '/chatbot/styles/notices.css',
+  '/chatbot/icons/icon-192x192.png',
+  '/chatbot/icons/icon-512x512.png'
 ];
 
 // Install the service worker and cache assets
