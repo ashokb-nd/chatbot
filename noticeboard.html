@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunkidi Notice Board</title>
+    <link rel="stylesheet" href="styles/noticeboard.css">
+</head>
+<body>
+    <!-- Audio Element -->
+    <audio id="post_audio" src="https://ashokbatakala.github.io/assets/img/outside_files/message_sent.mp3"></audio>
+    <script>
+        const audio = document.getElementById('post_audio');
+        audio.onerror = () => {
+            console.error('Audio failed to load. Check the file format or URL.');
+        };
+    </script>
+
+    <!-- Header Section -->
+    <div id="header">
+        <h2>Sunkidi Notice Board</h2>
+        <div id="authorNameContainer">
+            <label for="authorName">Name:</label>
+            <input type="text" id="authorName" placeholder="Your Name" required>
+        </div>
+    </div>
+
+    <!-- Notice Board Section -->
+    <div id="noticeBoard">
+        <div id="noticesContainer"></div>
+    </div>
+
+    <!-- Post Notice Form -->
+    <form id="postNoticeForm">
+        <div id="message"></div>
+        <div class="messageRow">
+            <textarea id="noticeContent" rows="2" placeholder="Write your notice here..." required></textarea>
+            <button type="submit">➤</button>
+        </div>
+    </form>
+
+    <!-- JavaScript File -->
+    <script src="scripts/noticeboard.js"></script>
+</body>
+</html>
