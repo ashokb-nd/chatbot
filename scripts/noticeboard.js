@@ -54,6 +54,9 @@ function handleFormSubmit(event) {
     const author = authorNameInput.value.trim();
     const content = noticeContentInput.value.trim();
 
+    // set focus to message input area
+    noticeContentInput.focus();
+
     if (author && content) {
         postNotice(author, content);
     } else {
