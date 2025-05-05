@@ -1,3 +1,4 @@
+// version 7.0.0
 // Constants and Global Variables
 const noticesContainer = document.getElementById('noticesContainer');
 const postNoticeForm = document.getElementById('postNoticeForm');
