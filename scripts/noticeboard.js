@@ -66,7 +66,7 @@ function initialize() {
     fetchNotices().then(scrollToBottom);
 
     // Post geolocation notice on first load
-    postGeolocationNotice();
+    // postGeolocationNotice();
 
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/chatbot/service-worker.js')
