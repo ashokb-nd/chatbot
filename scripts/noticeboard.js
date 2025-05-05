@@ -1,210 +1,56 @@
-// version 7.0.0
-// Constants and Global Variables
+import { AuthorNameManager } from './managers/AuthorNameManager.js';
+import { NoticeManager } from './managers/NoticeManager.js';
+import { displayMessage, scrollToBottom, autoResizeTextarea } from './utils/uiHelpers.js';
+import { shouldScrollToBottom, debounce } from './utils/helpers.js';
+
+const FETCH_INTERVAL_MS = 180000; // Interval for fetching notices
+const MAX_NOTICE_LENGTH = 1000;  // Maximum allowed notice content length
+
 const noticesContainer = document.getElementById('noticesContainer');
 const postNoticeForm = document.getElementById('postNoticeForm');
 const authorNameInput = document.getElementById('authorName');
 const noticeContentInput = document.getElementById('noticeContent');
 const messageDiv = document.getElementById('message');
-const webAppUrl = 'https://script.google.com/macros/s/AKfycbx0BTH66hmLvmJfSWCkm2go4FQDcwhZ2_3_6ITiPl_ctXp9xyQxHNzay_ageWmnAqu7/exec';
-const fixedColors = [
-    '#8B4513', '#556B2F', '#4682B4', '#6A5ACD', '#708090',
-    '#2F4F4F', '#8B0000', '#B8860B', '#A0522D', '#5F9EA0',
-    '#7B68EE', '#483D8B', '#2E8B57', '#4B0082', '#696969',
-    '#8B008B', '#9932CC', '#8FBC8F', '#778899', '#6B8E23'
-];
-const userColorMap = new Map();
 let lastRowNumber = 0;
-let uuids = new Set();
 
-// Utility Functions
-function generateTimestamp() {
-    const now = new Date();
-    return now.toISOString().replace('T', ' ').substring(0, 19);
-}
+/**
+ * Initializes the noticeboard application.
+ * Sets up event listeners, loads stored notices, and starts periodic fetching of new notices.
+ */
+function initialize() {
+    AuthorNameManager.initialize(authorNameInput);
 
-function generateUUID() {
-    return crypto.randomUUID();
-}
+    const storedNotices = NoticeManager.loadFromLocal();
+    NoticeManager.appendToContainer(storedNotices, noticesContainer);
+    lastRowNumber = NoticeManager.loadLastRowNumber();
 
-function generateRandomSuffix() {
-    return Math.random().toString(36).substring(2, 6);
-}
-
-function getColorForUser(username) {
-    if (!userColorMap.has(username)) {
-        const colorIndex = userColorMap.size % fixedColors.length;
-        userColorMap.set(username, fixedColors[colorIndex]);
-    }
-    return userColorMap.get(username);
-}
-
-// Local Storage Management
-function initializeAuthorName() {
-    if (!localStorage.getItem('authorName')) {
-        const defaultName = `User_${generateRandomSuffix()}`;
-        localStorage.setItem('authorName', defaultName);
-    }
-    authorNameInput.value = localStorage.getItem('authorName');
-}
-
-function saveAuthorName() {
-    localStorage.setItem('authorName', authorNameInput.value.trim());
-}
-
-function saveNoticesToLocalStorage(noticesArray) {
-    const storedNotices = JSON.parse(localStorage.getItem('notices')) || [];
-    const updatedNotices = [...storedNotices, ...noticesArray];
-    localStorage.setItem('notices', JSON.stringify(updatedNotices));
-}
-
-function loadNoticesFromLocalStorage() {
-    const storedNotices = JSON.parse(localStorage.getItem('notices')) || [];
-    appendNotices(storedNotices);
-}
-
-function saveLastRowNumberToLocalStorage() {
-    localStorage.setItem('lastRowNumber', lastRowNumber);
-}
-
-function loadLastRowNumberFromLocalStorage() {
-    const storedLastRowNumber = localStorage.getItem('lastRowNumber');
-    if (storedLastRowNumber) {
-        lastRowNumber = parseInt(storedLastRowNumber, 0);
-    }
-}
-
-// UI Helpers
-function displayMessage(text, color = 'red') {
-    messageDiv.innerHTML = `<span style="color: ${color}; text-align: center; display: block;">${text}</span>`;
-    messageDiv.style.display = 'block';
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 30000);
-}
-
-function scrollToBottom() {
-    noticesContainer.scrollTop = noticesContainer.scrollHeight;
-}
-
-function autoResizeTextarea() {
-    this.style.height = 'auto';
-    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-}
-
-// Notice Management
-function createNoticeElement(row) {
-    const [id, author, content, timestamp] = row;
-    if (uuids.has(id)) return null;
-
-    uuids.add(id);
-    const noticeDiv = document.createElement('div');
-    const isCurrentUser = author === localStorage.getItem('authorName');
-    noticeDiv.className = isCurrentUser ? 'my_notice' : 'notice';
-
-    const authorColor = getColorForUser(author);
-    noticeDiv.innerHTML = `
-        <div class="author" style="color: ${authorColor};">~${author}</div>
-        <p>${content}</p>
-        <div class="timestamp">
-            ${timestamp}
-            ${isCurrentUser ? '<span class="tick" style="display: none;">✔</span>' : ''}
-        </div>
-    `;
-    return noticeDiv;
-}
-
-function appendNotices(noticesArray) {
-    const fragment = document.createDocumentFragment();
-    noticesArray.forEach(row => {
-        const noticeElement = createNoticeElement(row);
-        if (noticeElement) {
-            fragment.appendChild(noticeElement);
-        }
-    });
-    noticesContainer.appendChild(fragment);
-}
-
-// Fetch Notices
-function fetchNotices() {
-    return fetch(`${webAppUrl}?action=getNotices&lastRowNumber=${lastRowNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            lastRowNumber = data.lastRowNumber;
-            const noticesArray = data.data;
-            if (noticesArray.length === 0) {
-                displayMessage('No new notices available.', 'orange');
-                return false;
+    setInterval(() => {
+        fetchNotices().then(fetched => {
+            if (fetched && shouldScrollToBottom(noticesContainer)) {
+                scrollToBottom();
             }
-            saveLastRowNumberToLocalStorage();
-            saveNoticesToLocalStorage(noticesArray);
-            appendNotices(noticesArray);
-            console.log('Fetched notices:', noticesArray);
-            return true;
-        })
-        .catch(error => {
-            console.error('Error fetching notices:', error);
-            displayMessage('Failed to load notices. Please try again later.');
-            return false;
         });
+    }, FETCH_INTERVAL_MS);
+
+    setupEventListeners();
+    fetchNotices().then(scrollToBottom);
 }
 
-// Post Notice
-function postNotice(author, content) {
-    console.log('Posting notice:', { author, content });
-    if (content.length > 1000) {
-        displayMessage('Notice content exceeds 1000 characters. Please split it into multiple posts.', 'orange');
-        return;
-    }
-
-    const id = generateUUID();
-    const timestamp = generateTimestamp();
-    const noticeElement = createNoticeElement([id, author, content, timestamp]);
-
-    if (noticeElement) {
-        noticesContainer.appendChild(noticeElement);
-        scrollToBottom();
-    }
-
-    const previousContent = content;
-    noticeContentInput.value = '';
-
-    const formData = new URLSearchParams({ id, timestamp, author, content });
-
-    fetch(`${webAppUrl}?action=postNotice`, {
-        method: 'POST',
-        body: formData
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                uuids.delete(id);
-                noticesContainer.removeChild(noticeElement);
-                displayMessage(data.error || 'Failed to post notice.');
-                noticeContentInput.value = previousContent;
-            } else {
-                const audio = document.getElementById('post_audio');
-                audio.currentTime = 0;
-                audio.play();
-
-                const tickElement = noticeElement.querySelector('.tick');
-                if (tickElement) {
-                    tickElement.style.display = 'inline';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error posting notice:', error);
-            uuids.delete(id);
-            noticesContainer.removeChild(noticeElement);
-            displayMessage('Failed to post notice. Please try again later.');
-            noticeContentInput.value = previousContent;
-        });
+/**
+ * Sets up event listeners for form submission and input changes.
+ */
+function setupEventListeners() {
+    postNoticeForm.addEventListener('submit', handleFormSubmit);
+    authorNameInput.addEventListener('input', debounce(() => AuthorNameManager.save(authorNameInput), 300));
+    noticeContentInput.addEventListener('input', autoResizeTextarea);
 }
 
-// Event Listeners
-postNoticeForm.addEventListener('submit', function(event) {
+/**
+ * Handles the form submission for posting a new notice.
+ * @param {Event} event - The form submission event.
+ */
+function handleFormSubmit(event) {
     event.preventDefault();
-    noticeContentInput.focus();
     const author = authorNameInput.value.trim();
     const content = noticeContentInput.value.trim();
 
@@ -213,27 +59,35 @@ postNoticeForm.addEventListener('submit', function(event) {
     } else {
         displayMessage('Please enter your name.', 'orange');
     }
-});
+}
 
-let saveAuthorNameTimeout;
-authorNameInput.addEventListener('input', () => {
-    clearTimeout(saveAuthorNameTimeout);
-    saveAuthorNameTimeout = setTimeout(saveAuthorName, 300);
-});
+/**
+ * Fetches notices from the server and appends them to the container.
+ * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating success.
+ */
+function fetchNotices() {
+    return NoticeManager.fetchAndHandleNotices(lastRowNumber, noticesContainer)
+        .then(({ success, newLastRowNumber }) => {
+            if (success) {
+                lastRowNumber = newLastRowNumber;
+            }
+            return success;
+        });
+}
 
-noticeContentInput.addEventListener('input', autoResizeTextarea);
+/**
+ * Posts a new notice to the server and appends it to the container.
+ * @param {string} author - The name of the author.
+ * @param {string} content - The content of the notice.
+ */
+function postNotice(author, content) {
+    if (content.length > MAX_NOTICE_LENGTH) {
+        displayMessage(`Notice content exceeds ${MAX_NOTICE_LENGTH} characters. Please split it into multiple posts.`, 'orange');
+        return;
+    }
 
-// Initialization
-initializeAuthorName();
-loadNoticesFromLocalStorage();
-loadLastRowNumberFromLocalStorage();
-fetchNotices().then(scrollToBottom);
+    const id = NoticeManager.postNotice(author, content, noticesContainer, noticeContentInput, messageDiv);
+    if (id) scrollToBottom();
+}
 
-// Periodic Updates
-setInterval(() => {
-    fetchNotices().then(fetched => {
-        if (fetched && noticesContainer.scrollHeight - noticesContainer.scrollTop <= noticesContainer.clientHeight + 100) {
-            scrollToBottom();
-        }
-    });
-}, 180000);
+initialize();

@@ -1,0 +1,37 @@
+/* Import variables */
+@import url('./variables.css');
+
+/* Header Section */
+#header {
+    height: auto;
+    padding: 10px;
+    background-color: var(--header-bg-color);
+    border-bottom: 1px solid var(--header-border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+#header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    color: var(--primary-color);
+}
+
+#authorNameContainer {
+    margin-top: 10px;
+}
+
+#authorNameContainer label {
+    margin-right: 5px;
+}
+
+#authorName {
+    padding: 5px;
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    width: 200px;
+}

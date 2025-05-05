@@ -1,0 +1,52 @@
+/* Import variables */
+@import url('./variables.css');
+
+/* Notice Styles */
+.notice, .my_notice {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: var(--input-border-radius);
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.notice {
+    width: 70%;
+    margin-right: auto;
+    background-color: var(--notice-bg-color);
+    border-left: 4px solid var(--notice-border-color);
+}
+
+.my_notice {
+    width: 70%;
+    margin-left: auto;
+    background-color: var(--my-notice-bg-color);
+    border-right: 4px solid var(--my-notice-border-color);
+}
+
+.notice p, .my_notice p {
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+.notice .author, .my_notice .author {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 0.85em;
+    color: var(--author-color);
+}
+
+.notice .timestamp, .my_notice .timestamp {
+    font-size: 0.75em;
+    color: var(--timestamp-color);
+    margin-top: 5px;
+}
+
+/* Tick Icon */
+.tick {
+    font-size: 0.8em;
+    color: var(--my-notice-border-color);
+    margin-left: 5px;
+}

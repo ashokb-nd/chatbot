@@ -1,0 +1,22 @@
+/* CSS Variables */
+:root {
+    --font-family: Arial, sans-serif;
+    --background-color: #f9f9f9;
+    --text-color: #333;
+    --header-bg-color: #fff;
+    --header-border-color: #ccc;
+    --primary-color: #00796b;
+    --notice-bg-color: #e3f2fd;
+    --notice-border-color: #2196f3;
+    --my-notice-bg-color: #e8f5e9;
+    --my-notice-border-color: #4caf50;
+    --author-color: #555;
+    --timestamp-color: #999;
+    --error-color: red;
+    --button-bg-color: #00796b;
+    --button-text-color: #fff;
+    --input-border-color: #ccc;
+    --input-border-radius: 4px;
+}
+
+

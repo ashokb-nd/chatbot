@@ -1,0 +1,46 @@
+/* Import variables */
+@import url('./variables.css');
+
+/* Post Notice Form */
+#postNoticeForm {
+    height: auto;
+    padding: 10px;
+    background-color: var(--header-bg-color);
+    border-top: 1px solid var(--header-border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: sticky;
+    bottom: 0;
+}
+
+.messageRow {
+    display: flex;
+    gap: 10px;
+}
+
+#noticeContent {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid var(--input-border-color);
+    border-radius: var(--input-border-radius);
+    resize: none;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#postNoticeForm button {
+    padding: 5px 20px;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    border-radius: var(--input-border-radius);
+    cursor: pointer;
+    font-size: large;
+}
+
+/* Message Display */
+#message {
+    font-size: 0.9em;
+    color: var(--error-color);
+}
