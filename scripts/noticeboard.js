@@ -13,7 +13,7 @@ const noticeContentInput = document.getElementById('noticeContent');
 const messageDiv = document.getElementById('message');
 let lastRowNumber = 0;
 
-displayMessage("version 8.2.1", "green");
+displayMessage("version 9", "green");
 /**
  * Initializes the noticeboard application.
  * Sets up event listeners, loads stored notices, and starts periodic fetching of new notices.
@@ -35,6 +35,16 @@ function initialize() {
 
     setupEventListeners();
     fetchNotices().then(scrollToBottom);
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
 }
 
 /**
