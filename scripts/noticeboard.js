@@ -13,6 +13,7 @@ const noticeContentInput = document.getElementById('noticeContent');
 const messageDiv = document.getElementById('message');
 let lastRowNumber = 0;
 
+displayMessage("version 8.3.0", "green");
 /**
  * Initializes the noticeboard application.
  * Sets up event listeners, loads stored notices, and starts periodic fetching of new notices.
